@@ -1,0 +1,75 @@
+DEFINE LCD_DREG PORTD
+DEFINE LCD_DBIT 4
+DEFINE LCD_RSREG PORTE 
+DEFINE LCD_RSBIT 0
+DEFINE LCD_EREG PORTE
+DEFINE LCD_EBIT 1
+DEFINE LCD_BITS 4
+
+DEFine HSER_RCSTA 90h
+define HSER_TXSTA 24h
+define HSER_BAUD 9600
+DEFINE HSER_CLROERR 1
+
+ADCON1=7
+PAUSE 100
+
+trisa=0
+trisc=0
+trisd=0
+trise=0
+
+ADCON1=7
+PortA=%111111
+PortC=0
+PortD=0
+PortE=0
+
+' symbol ses =PortE.2
+
+abuzettin:
+    PortA=%111011
+    pause 100
+    PortA=%111101
+    pause 100
+    PortA=%111110
+    pause 100
+    
+    gosub ileri
+    gosub geri
+    gosub saga
+    gosub sola
+    
+'    sound ses,[10,50,20,50,30,50]   'birinciler ton ikinciler pause
+    
+goto abuzettin
+
+ileri:
+    lcdout $fe,1,"ileri gidiyor"
+    PortC=%00010110
+    PortD=%00000100
+    pause 500
+return
+                 
+geri:
+    lcdout $fe,1,"geri gidiyor"
+    PortC=%00100110
+    PortD=%00001000
+    pause 500
+return
+
+saga:
+    lcdout $fe,1,"saga donuyor"
+    PortC=%00100110
+    PortD=%00001000
+    pause 500
+return
+
+sola:
+    lcdout $fe,1,"sola donuyor"
+    PortC=%00100110
+    PortD=%00000100
+    pause 500
+return
+    
+ 
