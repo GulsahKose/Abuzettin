@@ -1,3 +1,5 @@
+Define LOADER_USED 1
+
 DEFINE LCD_DREG PORTD
 DEFINE LCD_DBIT 4
 DEFINE LCD_RSREG PORTE 
@@ -12,28 +14,37 @@ define HSER_BAUD 9600
 DEFINE HSER_CLROERR 1
 
 ADCON1=7
-PAUSE 100
 
 trisa=0
 trisc=0
 trisd=0
 trise=0
+trisb=%10000001
 
 ADCON1=7
 PortA=%111111
 PortC=0
 PortD=0
 PortE=0
+PortB=%00000000
 
 ' symbol ses =PortE.2
 
+symbol sagteker = PortB.0 
+symbol solteker = PortB.7 
+i var byte 
+i=0
+j var byte
+j=0
+lcdout $fe,1
+
 abuzettin:
-    PortA=%111011
-    pause 100
-    PortA=%111101
-    pause 100
-    PortA=%111110
-    pause 100
+'    PortA=%111011
+'    pause 100
+'    PortA=%111101
+'    pause 100
+'    PortA=%111110
+'    pause 100
     
     gosub ileri
     gosub geri
@@ -41,6 +52,21 @@ abuzettin:
     gosub sola
     
 '    sound ses,[10,50,20,50,30,50]   'birinciler ton ikinciler pause
+'    if sagteker= 1 then
+'        i=i+1
+'        lcdout $fe,$80,"sag ",#i
+'        while sagteker=1
+            
+'        wend
+'    endif
+'    if solteker= 1 then 
+'        j=j+1
+'        lcdout $fe,$C0,"sol ",#j
+'        while solteker=1
+           
+'        wend
+'    endif
+'    pause 100
     
 goto abuzettin
 
@@ -71,5 +97,8 @@ sola:
     PortD=%00000100
     pause 500
 return
+
+
+
     
  
