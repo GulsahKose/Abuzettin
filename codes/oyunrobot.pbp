@@ -1,0 +1,99 @@
+'****************************************************************
+'*  Name    : UNTITLED.BAS                                      *
+'*  Author  : [select VIEW...EDITOR OPTIONS]                    *
+'*  Notice  : Copyright (c) 2014 [select VIEW...EDITOR OPTIONS] *
+'*          : All Rights Reserved                               *
+'*  Date    : 24.10.2014                                        *
+'*  Version : 1.0                                               *
+'*  Notes   :                                                   *
+'*          :                                                   *
+'****************************************************************
+include "sabitler.pbp"
+
+trisa=%00000000
+trisc=%10000000
+trisd=%00000000
+trise=%00000000
+trisb=%10101011
+
+PortA=%111111
+PortC=0
+PortD=0
+PortE=0
+PortB=%00000000
+
+symbol ses =PortE.2
+symbol sagteker = PortB.0 
+symbol solteker = PortB.7 
+
+j var byte
+i var byte
+x var byte
+y var byte
+z var byte
+k var byte 
+i=0
+j=0
+bekle con 10 
+ana:
+   PortC=0
+   PortD=0
+   HSERIN [k]
+   select case k
+    case "w"
+        gosub ileri
+    case "a"
+        gosub sola
+    case "d"
+        gosub saga
+    case "s"
+        gosub geri
+        
+   
+   end select
+     
+goto ana
+ileri:
+'    lcdout $fe,1,"ileri gidiyor"
+    PortC=%00010110
+    PortD=%00000100
+    gosub tursay
+    pause bekle
+return
+                 
+geri:
+'    lcdout $fe,1,"geri gidiyor"
+    PortC=%00100110
+    PortD=%00001000
+    gosub tursay
+    pause bekle
+return
+
+saga:
+'    lcdout $fe,1,"saga donuyor"
+    PortC=%00010110
+    PortD=%00001000
+    gosub tursay
+    pause bekle
+return
+
+sola:
+'    lcdout $fe,1,"sola donuyor"
+    PortC=%00100110
+    PortD=%00000100
+    gosub tursay
+    pause bekle
+return
+tursay:
+  if sagteker= 1 or solteker=1 then
+        i=i+1
+        j=j+1
+        lcdout $fe,$80,"sag ",#i
+        lcdout $fe,$C0,"sol ",#j
+        while sagteker=1 and solteker=1
+            
+        wend
+    endif
+    
+    pause 10
+return
