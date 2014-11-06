@@ -1,74 +1,102 @@
-Define LOADER_USED 1
+include "sabitler.pbp"
 
-DEFINE LCD_DREG PORTD
-DEFINE LCD_DBIT 4
-DEFINE LCD_RSREG PORTE 
-DEFINE LCD_RSBIT 0
-DEFINE LCD_EREG PORTE
-DEFINE LCD_EBIT 1
-DEFINE LCD_BITS 4
+trisa=%00000000
+trisc=%10000000
+trisd=%00000000
+trise=%00000000
+trisb=%10101011
 
-DEFine HSER_RCSTA 90h
-define HSER_TXSTA 24h
-define HSER_BAUD 9600
-DEFINE HSER_CLROERR 1
-
-ADCON1=7
-
-trisa=0
-trisc=0
-trisd=0
-trise=0
-trisb=%10000001
-
-ADCON1=7
 PortA=%111111
 PortC=0
 PortD=0
 PortE=0
 PortB=%00000000
 
-' symbol ses =PortE.2
-
+symbol ses =PortE.2
 symbol sagteker = PortB.0 
 symbol solteker = PortB.7 
-i var byte 
-i=0
+symbol ortagonder = PortB.4
+Symbol ortaal = PortB.3
+symbol saggonder = PortB.2
+Symbol sagal = PortB.1
+symbol solgonder = PortB.6
+Symbol solal = PortB.5
+
 j var byte
+i var byte
+x var byte
+y var byte
+z var byte
+k var byte 
+i=0
 j=0
+
+bekle con 400 
+
+ortaalgila var word
+ortamesafe var word
+sagalgila var word
+sagmesafe var word
+solalgila var word
+solmesafe var word
+cevir_cm con 6
+solgonder=0
+ortagonder=0
+saggonder=0
+
 lcdout $fe,1
 
-abuzettin:
-'    PortA=%111011
-'    pause 100
-'    PortA=%111101
-'    pause 100
-'    PortA=%111110
-'    pause 100
+
+
+'ledyakma:
+'    PortA=%111011  'kýrmýzý
+'    pause bekle
+'    PortA=%111101   'yeþil
+'    pause bekle
+'    PortA=%111110    'mavi
+'    pause bekle
+'goto ledyakma
+
+'seda:
+'    sound ses,[10,50,20,50,30,50]   'birinciler ton ikinciler pause
+'goto seda
+
+motordon:  
+'    hserin [x]
+'    if x="w" then goto ortasensor
+'    if x="q" then goto solsensor
+'    if x="e" then goto sagsensor
+    
+'   gosub ortasensor
+'    pause 200
+'    gosub sagsensor
+'    pause 200
+'    gosub solsensor
+'    pause 200
     
     gosub ileri
     gosub geri
     gosub saga
     gosub sola
     
-'    sound ses,[10,50,20,50,30,50]   'birinciler ton ikinciler pause
-'    if sagteker= 1 then
-'        i=i+1
-'        lcdout $fe,$80,"sag ",#i
-'        while sagteker=1
+'    Tur saydýrma
+    if sagteker= 1 then
+        i=i+1
+        lcdout $fe,$80,"sag ",#i
+        while sagteker=1
             
-'        wend
-'    endif
-'    if solteker= 1 then 
-'        j=j+1
-'        lcdout $fe,$C0,"sol ",#j
-'        while solteker=1
+        wend
+    endif
+    if solteker= 1 then 
+        j=j+1
+        lcdout $fe,$C0,"sol ",#j
+        while solteker=1
            
-'        wend
-'    endif
-'    pause 100
+        wend
+    endif
+    pause 100
     
-goto abuzettin
+goto motordon
 
 ileri:
     lcdout $fe,1,"ileri gidiyor"
@@ -86,7 +114,7 @@ return
 
 saga:
     lcdout $fe,1,"saga donuyor"
-    PortC=%00100110
+    PortC=%00010110
     PortD=%00001000
     pause 500
 return
@@ -97,6 +125,46 @@ sola:
     PortD=%00000100
     pause 500
 return
+
+ortasensor:
+    pulsout ortagonder,1
+    pulsin ortaal,1,ortaalgila
+    ortamesafe=ortaalgila/cevir_cm
+    pause 1
+    
+    hserout ["orta :",DEC ortamesafe,13,10]
+    lcdout $fe,1
+    lcdout $fe,$C0,"orta=",#ortamesafe
+    hserin 1000,ortasensor,[y]
+    if y="s" then goto motordon
+    pause 200
+goto ortasensor
+
+sagsensor:
+    pulsout saggonder,1
+    pulsin sagal,1,sagalgila
+    sagmesafe=sagalgila/cevir_cm
+    pause 1
+    hserout ["sag :", DEC sagmesafe,13,10]
+    lcdout $fe,1
+    lcdout $fe,$80,"sag=",#sagmesafe
+     hserin 1000,sagsensor,[z]
+    if z="s" then goto motordon
+    pause 200
+goto sagsensor
+
+solsensor:
+    pulsout solgonder,1
+    pulsin solal,1,solalgila
+    solmesafe=solalgila/cevir_cm
+    pause 1
+    hserout ["sol :",DEC solmesafe,13,10]
+    lcdout $fe,1
+    lcdout $fe,$88,"sol=",#solmesafe
+     hserin 1000,solsensor,[k]
+    if k="s" then goto motordon
+    pause 200
+goto solsensor
 
 
 
