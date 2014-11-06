@@ -24,8 +24,18 @@ PortB=%00000000
 
 symbol ses =PortE.2
 symbol sagteker = PortB.0 
-symbol solteker = PortB.7 
+symbol solteker = PortB.7
+symbol enable1 = PortC.1
+symbol enable2 = PortC.2
+symbol in1 = PortD.2 
+symbol in2 = PortD.3
+symbol in3 = PortC.4
+symbol in4 = PortC.5
 
+vites var byte
+vites = 150
+lcdout $fe,1
+lcdout $fe, $C0,"Vites = ",#vites
 j var byte
 i var byte
 x var byte
@@ -36,8 +46,9 @@ i=0
 j=0
 bekle con 10 
 ana:
-   PortC=0
-   PortD=0
+
+'   PortC=0
+'   PortD=0
    HSERIN [k]
    select case k
     case "w"
@@ -48,40 +59,72 @@ ana:
         gosub saga
     case "s"
         gosub geri
-        
+    case "v"
+        if vites < 250 then
+            vites=vites+10 
+            lcdout $fe,1
+            lcdout $fe, $C0,"Vites = ",#vites
+        endif
+    case "c"
+        if vites != 0 then
+            vites=vites-10
+            lcdout $fe,1
+            lcdout $fe, $C0,"Vites = ",#vites
+        endif
    
    end select
      
 goto ana
 ileri:
 '    lcdout $fe,1,"ileri gidiyor"
-    PortC=%00010110
-    PortD=%00000100
-    gosub tursay
+    pwm enable1, vites, 10
+    in1 = 1
+    in2 = 0
+    pwm enable2, vites, 10
+    in3 = 1
+    in4 = 0
+    'gosub tursay
     pause bekle
 return
                  
 geri:
 '    lcdout $fe,1,"geri gidiyor"
-    PortC=%00100110
-    PortD=%00001000
-    gosub tursay
+    pwm enable1, vites, 10
+    in1 = 0
+    in2 = 1
+    pwm enable2, vites, 10
+    in3 = 0
+    in4 = 1
     pause bekle
 return
 
 saga:
 '    lcdout $fe,1,"saga donuyor"
-    PortC=%00010110
-    PortD=%00001000
-    gosub tursay
+    pwm enable1, vites, 10
+    in1 = 0
+    in2 = 1
+    pwm enable2, vites, 10
+    in3 = 1
+    in4 = 0
+'    PortC=%00010110
+'    PortD=%00001000
+'    gosub tursay
     pause bekle
 return
 
 sola:
 '    lcdout $fe,1,"sola donuyor"
-    PortC=%00100110
-    PortD=%00000100
-    gosub tursay
+    pwm enable1, vites, 10
+    in1 = 1
+    in2 = 0
+    pwm enable2, vites, 10
+    in3 = 0
+    in4 = 1
+'    pwm enable1, 200 ,10
+'    pwm enable2, 200 ,10
+'    PortC=%00100000
+'    PortD.2 = 1
+'    gosub tursay
     pause bekle
 return
 tursay:
