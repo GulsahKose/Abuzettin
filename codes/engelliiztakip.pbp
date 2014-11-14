@@ -1,0 +1,203 @@
+include "sabitler.pbp"
+
+trisa=%00000000
+trisc=%10000001
+trisd=%00000011
+trise=%00000000
+trisb=%10101011
+
+SYMBOL solsensor = PORTC.0
+SYMBOL ortasensor = PORTD.1
+SYMBOL sagsensor = PORTD.0
+
+
+
+PortA=%111111
+
+PortE=0
+PortB=%00000000
+'robot etrafindaki sensorler
+symbol ortagonder = PortB.4
+Symbol ortaal = PortB.3
+symbol saggonder = PortB.2
+Symbol sagal = PortB.1
+symbol solgonder = PortB.6
+Symbol solal = PortB.5
+
+ortaalgila var word
+ortamesafe var word
+sagalgila var word
+sagmesafe var word
+solalgila var word
+solmesafe var word
+cevir_cm con 6
+solgonder=0
+ortagonder=0
+saggonder=0
+i var byte
+enson var byte
+
+
+bekle con 100 
+
+
+
+symbol sagteker = PortB.0 
+symbol solteker = PortB.7
+symbol enable1 = PortC.1
+symbol enable2 = PortC.2
+symbol in1 = PortD.2 
+symbol in2 = PortD.3
+symbol in3 = PortC.4
+symbol in4 = PortC.5
+
+vites var byte
+vites = 220
+lcdout $fe,1
+lcdout $fe, $C0,"Vites = ",#vites
+
+
+t1:
+
+gosub eortasensor
+if ortamesafe > 12 or ortamesafe=0 then
+   if ortasensor=1 then
+         if sagsensor=0 then enson=1 : gosub saga
+   
+         if solsensor=0 then enson=0 : gosub sola
+   
+         if sagsensor=1 and solsensor=1 then 
+            if enson=1 then gosub saga
+            if enson=0 then gosub sola
+         ENDIF
+   else
+        gosub ileri
+   endif
+else
+    gosub sagadon
+    gosub esolsensor
+    while solmesafe<15
+        gosub ileri
+        gosub esolsensor
+    wend
+    gosub soladon
+    
+    gosub esolsensor
+    while solmesafe>15
+        gosub ileri
+        gosub esolsensor
+    wend
+    
+    gosub esolsensor
+    while solmesafe<15
+        gosub ileri
+        gosub esolsensor
+    wend
+    
+    gosub soladon
+endif
+   
+goto t1
+
+ileri:
+    pwm enable1, vites, 10
+    in1 = 1
+    in2 = 0
+    pwm enable2, vites, 10
+    in3 = 1
+    in4 = 0
+    pause bekle
+return
+                 
+geri:
+    pwm enable1, vites, 10
+    in1 = 0
+    in2 = 1
+    pwm enable2, vites, 10
+    in3 = 0
+    in4 = 1
+    pause bekle
+return
+
+saga:
+    
+    pwm enable1, 250, 10
+
+    in1 = 0
+    in2 = 1
+    pwm enable2, 250, 10
+    
+    in3 = 1
+    in4 = 0
+
+    pause 10
+
+return
+
+sola:
+    pwm enable1, vites, 10
+    in1 = 1
+    in2 = 0
+    pwm enable2, vites, 10
+    in3 = 0
+    in4 = 1
+    pause bekle
+return
+
+
+eortasensor:
+    pulsout ortagonder,1
+    pulsin ortaal,1,ortaalgila
+    ortamesafe=ortaalgila/cevir_cm
+    pause 1
+    lcdout $fe,1
+    lcdout $fe,$C0,"orta=",#ortamesafe
+    pause 200
+return
+
+esagsensor:
+    pulsout saggonder,1
+    pulsin sagal,1,sagalgila
+    sagmesafe=sagalgila/cevir_cm
+    pause 1
+    lcdout $fe,1
+    lcdout $fe,$80,"sag=",#sagmesafe
+
+    pause 200
+return
+
+esolsensor:
+    pulsout solgonder,1
+    pulsin solal,1,solalgila
+    solmesafe=solalgila/cevir_cm
+    pause 1
+    hserout ["sol :",DEC solmesafe,13,10]
+    lcdout $fe,1
+    lcdout $fe,$88,"sol=",#solmesafe
+
+    pause 200
+return 
+
+sagadon:
+for i=1 to 29
+    pwm enable1, 250, 10 
+    in1 = 0
+    in2 = 1
+    pwm enable2, 250, 10     
+    in3 = 1
+    in4 = 0
+    pause 10
+next i
+return
+
+soladon:
+for i=1 to 29
+    pwm enable1, vites, 10
+    in1 = 1
+    in2 = 0
+    pwm enable2, vites, 10
+    in3 = 0
+    in4 = 1
+    pause 10
+next i    
+return

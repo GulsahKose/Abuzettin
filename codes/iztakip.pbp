@@ -1,0 +1,118 @@
+include "sabitler.pbp"
+
+trisa=%00000000
+trisc=%10000001
+trisd=%00000011
+trise=%00000000
+trisb=%10101011
+
+SYMBOL solsensor = PORTC.0
+SYMBOL ortasensor = PORTD.1
+SYMBOL sagsensor = PORTD.0
+
+
+
+PortA=%111111
+PortC=0
+PortD=0
+PortE=0
+PortB=%00000000
+
+
+i var byte
+enson var byte
+
+
+bekle con 100 
+
+
+
+symbol sagteker = PortB.0 
+symbol solteker = PortB.7
+symbol enable1 = PortC.1
+symbol enable2 = PortC.2
+symbol in1 = PortD.2 
+symbol in2 = PortD.3
+symbol in3 = PortC.4
+symbol in4 = PortC.5
+
+vites var byte
+vites = 220
+lcdout $fe,1
+lcdout $fe, $C0,"Vites = ",#vites
+
+
+t1:
+
+
+   if ortasensor=1 then
+         if sagsensor=0 then enson=1 : gosub saga
+   
+         if solsensor=0 then enson=0 : gosub sola
+   
+         if sagsensor=1 and solsensor=1 then 
+            if enson=1 then gosub saga
+            if enson=0 then gosub sola
+         ENDIF
+   else
+        gosub ileri
+   endif
+    
+goto t1
+
+ileri:
+    pwm enable1, vites, 10
+    in1 = 1
+    in2 = 0
+    pwm enable2, vites, 10
+    in3 = 1
+    in4 = 0
+    pause bekle
+return
+                 
+geri:
+    pwm enable1, vites, 10
+    in1 = 0
+    in2 = 1
+    pwm enable2, vites, 10
+    in3 = 0
+    in4 = 1
+    pause bekle
+return
+
+saga:
+    
+    pwm enable1, 250, 10
+
+    in1 = 0
+    in2 = 1
+    pwm enable2, 250, 10
+    
+    in3 = 1
+    in4 = 0
+
+    pause 10
+
+return
+
+sola:
+    pwm enable1, vites, 10
+    in1 = 1
+    in2 = 0
+    pwm enable2, vites, 10
+    in3 = 0
+    in4 = 1
+    pause bekle
+return
+
+
+
+
+
+
+
+
+
+
+    
+ 
