@@ -46,8 +46,6 @@ saggonder=0
 
 lcdout $fe,1
 
-
-
 'ledyakma:
 '    PortA=%111011  'kýrmýzý
 '    pause bekle
